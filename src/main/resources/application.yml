@@ -1,0 +1,14 @@
+cloud:
+    aws:
+        credentials:
+            access-key: AKIAQLTUU5EQBAGL5V72
+            secret-key: 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
+        region:
+            static: eu-north-1
+        url: https://e811k3x3se.execute-api.eu-north-1.amazonaws.com/v1/
+        bucket_name: bucketwithfuckinguniquename/
+spring:
+    datasource:
+        password: daredevil6182
+        url: jdbc:postgresql://localhost:5432/pet-project
+        username: postgres

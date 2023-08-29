@@ -5,10 +5,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.coyote.Response;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -16,30 +15,39 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 
 @Service
 public class PhotoService {
+
+    @Value("${cloud.aws.url}")
+    private String url;
+
+    @Value("${cloud.aws.bucket_name}")
+    private String bucketName;
 
     public ResponseEntity<String> uploadPhoto(MultipartFile file) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
-        //File file = new File(path);
         MultiValueMap<String, Object> body
                 = new LinkedMultiValueMap<>();
-        body.add("file", file);
+        try {
+            body.add("file", file.getBytes());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity
                 = new HttpEntity<>(body, headers);
 
-        String serverUrl = "https://e811k3x3se.execute-api.eu-north-1.amazonaws.com/v1/bucketwithfuckinguniquename/" + file.getOriginalFilename();
+        String serverUrl = url + bucketName + file.getOriginalFilename();
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate
-                .postForEntity(serverUrl, requestEntity, String.class);
+        ResponseEntity<String> response = new ResponseEntity<>(HttpStatus.ACCEPTED);
+        restTemplate
+                .put(serverUrl, requestEntity, String.class);
 
         return response;
     }
