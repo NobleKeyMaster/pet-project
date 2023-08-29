@@ -19,4 +19,8 @@ public class PhotoController {
         return photoService.uploadPhoto(file);
     }
 
+    @DeleteMapping("/delete/{fileName}")
+    public ResponseEntity<String> deletePhoto(@PathVariable("fileName") String fileName) {
+        return photoService.deletePhoto(fileName);
+    }
 }

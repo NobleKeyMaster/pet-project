@@ -52,4 +52,17 @@ public class PhotoService {
         return response;
     }
 
+
+    public ResponseEntity<String> deletePhoto(String fileName) {
+        HttpHeaders headers = new HttpHeaders();
+        String serverUrl = url + bucketName + fileName;
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = new ResponseEntity<>(HttpStatus.ACCEPTED);
+        restTemplate
+                .delete(serverUrl, String.class);
+
+        return response;
+    }
+
 }
